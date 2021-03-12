@@ -1,0 +1,287 @@
+
+---
+title: "Problem Set 01"
+author: 
+- name: Camille Leyrer
+- name: Dominik Walter
+date: "10 March 2021"
+output:
+  html_document:
+    highlight: tango
+    theme: cosmo
+    toc: yes
+    toc_depth: 2
+    toc_float:
+      collapsed: false
+    df_print: paged
+---
+
+```{r, include=FALSE}
+# Keep this setup code chunk also in your problem set.
+# Also, use this line to load the packages that are needed
+library(tidyverse)
+library(kableExtra)
+library(DiagrammeR)
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning = FALSE)
+```
+
+
+**Submission deadline: Tuesday 16th of March, h. 19:00 (making repo public)**
+
+# Learning goals
+
+- Experience a fully-reproducible and collaborative workflow using RStudio Projects, RMarkdown and GitHub. 
+- Practice basic linear regression. 
+- Understand the basic scientific research workflow through an active replication of results from a scientific paper.
+
+
+# Collaborative workflow using GitHub
+
+You must work collaboratively using GitHub. I recommend planning the work at the start, also assigning exercises to the different team members. 
+This can avoid a lot of merge conflicts. Check out this nice [GitHub workflow description](https://guides.github.com/introduction/flow/). 
+
+Create a **private** repository to avoid disclosing the solutions to the other teams. However, you can always ask for support and share tips & information (i.e., not complete solution code) creating a GitHub issue that describes your problem. 
+
+You can work in the `master` repo or, even better, you can experience creating a dedicated `branch` for you work. 
+My recommendation is to develop the workflow round these lines:  
+1. From GitHub, create an issue called `yourname-todofeature-progressivenumber` (e.g.: `andrea-exerc1-1`) and briefly describe what you do in there. E.g., "I am going to do exercise 1".  
+2. Then, we [create `branch`](https://stackoverflow.com/a/55592824) named after the issue. Work, commit, commit, commit.  
+3. Once your part of the exercise is completed, push and create a [pull request](https://guides.github.com/introduction/flow/).  
+4. Discuss any changes and let other review your work.  
+5. If everything is OK, complete by merging the pull request into the master and closing the related issue. You can also [link the pull request to the issue](https://docs.github.com/en/github/managing-your-work-on-github/linking-a-pull-request-to-an-issue) for greater clarity.
+
+Remember that merge conflicts are not the devil, and most of the times they are easy to correct. 
+
+# Learn statistics using simulations
+
+**Instructions**.  
+Simulating data generation processes is an excellent learning tool because, unlike standard data analysis, it allows practicing statistical analysis in a context were the main quantities of interest are assumed, and therefore known in advanced. 
+Thus, we can using this knowledge to compare our expectations with the actual results. Simulations (also known as Monte Carlo simulations, or Monte Carlo experiments), work with random number generation, drawing simulated (i.e., randomly generated) values from pre-specified [probabilistic distributions](https://en.wikipedia.org/wiki/Probability_distribution). 
+Besides being an excellent learning tool, Monte Carlo simulations have a wide range of powerful research and statistical applications, including: analysis of the properties of statistical estimators, research design definition, Bayesian statistics, and agent-based modeling. 
+
+To simulate a data generating process we must simulate all the quantities that participate in the creation of the simulated data. 
+These quantities usually include:  
+1. Observed (and possibly unobservable) **exogenous variables** for which we must describe a distribution;  
+2. **Population parameters**, that may include simple values or (for more complicated applications) a distribution;  
+3. **Error terms** and their distribution;  
+4. Dependent variable (and possibly other **endogenous variables**).   
+5. Number of observations (and eventually their structure).   
+
+Having listed and clarified these elements, we can simulate our data generation process and obtain a simulated data set. Then, we can use the data *as if* it is real data and use it to explore the properties of statistical models or research designs. The next section provides an introductory example with the basic R code to implement a simulation study. 
+
+## Example
+
+Here is a basic example of simulated data with the R code. 
+
+In this example, we simulate a simple data structure with one independent variable `x1` having a causal effect on the dependent variable `y`. We will assume a simple linear and additive specification, corresponding to the equation: $y = a + b \cdot x1 + e$, where the two parameters `a` and `b` represent respectively an intercept and the slope of the relationship, and `e` is normally-distributed error term. These choices can, of course, be changed at will. They simply represent standard assumptions for the sake of this introductory example.
+
+This data generating process can be represented with the following diagram:
+```{r}
+library("DiagrammeR", quietly = TRUE)
+
+# Learn the DiagrammeR package here: 
+# https://rich-iannone.github.io/DiagrammeR/#features
+
+grViz("
+      digraph boxes_and_circles {
+      
+      # add nodes (variables):
+      # Exogenous variables are circles
+      node [shape = circle]
+      X; e
+      
+      # Endogenous variables are squares
+      node [shape = square]
+      Y
+      
+      # Connect nodes with edges
+      X -> Y; e -> Y
+      }
+")
+```
+
+
+Having generated the data according to this relationship, we assume that we are interested in estimating this causal effect of `x1` on `y` using a linear regression model. 
+
+Let's simulate the data. First, we must assume the four relevant quantities described above to generate the data:  
+1. Observed variable `x`. We assume that `x` is drawn from a standard normal distribution `N(mean = 0, sd = 1)`. We write this as: $x \sim N(\mu = 0, \sigma = 1)$. The variable `x` is randomly drawn from this distribution (and, therefore, *exogenous*).  
+2. Population parameters: we set the intercept `a = 0.3` and the slope `b = 0.7`.   
+3. Error term: `e` also drawn from a standard normal distribution ($e \sim N(\mu = 0, \sigma = 1)$).  
+4. Dependent variable: `y`, which is generated as a simple linear function of `x`.   
+5. We have quite powerful computers, so we decide to simulate a sample of `N = 5000` observations. The observations are all independent (so no structure is imposed).   
+
+Since we are working with randomly-generated numbers, we use `set.seed()` to reproduce the numbers. To call this function just give it any discrete number: if the number ("seed") is the same, the randomly-generated values will be the same. 
+
+```{r}
+
+set.seed(9032021) # For reproducibility (I like to use dates as seed)
+
+df <- tibble(     # `tibble()` creates a data frame, similar to `base::data.frame()`
+  
+  # Exogenous variable & error term:
+  x = rnorm(n = 5000, mean = 0, sd = 1),    # rnorm(n, mean, sd), arguments not repeated below 
+  e = rnorm(5000, 0, 1)
+)
+
+#Population parameters
+a <- 0.3
+b <- 0.7
+
+# Dependent variable:
+df <- df %>% 
+  mutate(                          # mutate() creates new variables within a data frame
+  y = a + b * x + e
+) %>% 
+  relocate(y, x, e)                # to reorder the variables
+```
+
+At this point, we can visualize the simulated data: 
+
+```{r}
+df
+```
+
+At this point, we have a simulated data set. 
+Note that, unlike standard data analyses, we can observe the error term `e`, and we also know the exact values of the parameters `a` and `b`. 
+This is, of course, never the case when working with real data. 
+
+We now want to explore if linear regression models can do a good job in estimating these parameters under the simulated conditions. 
+Thus, we fit a linear regression model using the `lm()` function and inspect the results. 
+
+```{r}
+fit <- lm(y ~ x, data = df)
+
+summary(fit)    # `summary()` produces a quick regression table
+coef(fit)       # You can extract the coefficients with `coef()`
+
+# We can also compute the predicted values (yhat) and the residuals:
+df <- df %>% 
+  mutate(
+    yhat = predict(fit), 
+    resid = residuals(fit)
+  )
+df
+
+# Plotting the residuals and predicted values is a classic diagnostic plot.
+# Values should be dispersed around 0 without any visible pattern:
+ggplot(data = df, aes(y = resid, x = yhat)) + 
+  geom_point() + 
+  labs(title = "Diagnostic plot", y = "Residuals", x = "Predicted values") + 
+  theme_bw()
+
+```
+
+We can then compare the parameters that were assumed and the estimated coefficients:
+```{r}
+# Parameters
+c(a, b)
+
+# Estimates
+coef(fit)
+```
+The estimates are not identical but very close to the parameters. 
+Feel free to play around changing the elements of the data simulation process and to observe how the estimates change. 
+
+
+## Exercise 1: Multivariate linear regression modelling
+
+In this exercise, you will simulate a data structure with two observed independent variables to practice multivariate regression modeling.  
+
+**Instructions**. Generate data with:  
+- Two observed independent variables `x1` and `x2` respectively drawn from a standard normal distribution $x1 \sim N(0, sd = 15)$ and $x2 \sim N(-10, sd = 1/2)$.  
+- Both `x1` and `x2` have a causal effect on `y`. We will assume a simple linear and additive specification, corresponding to the equation: $y = a + b1 \cdot x1 + b2 \cdot x2 +e$, where the two parameters `a` and `b` represent respectively an intercept and the slope of the relationship, and `e` is normally-distributed error term $e \sim N(0, sd = 1)$.  
+- Set the parameters as follows: `a = -10`, `b1 = 0.1`, `b2 = 2`.  
+- Consider a sample of `N = 5000` observations.  
+- Don't forget to set the seed to a number of choice.  
+
+
+### Exercise 1.1
+
+Follow the instructions to generate a simulated data set. 
+
+```{r}
+
+set.seed(11032021) # For reproducibility (I like to use dates as seed)
+
+df <- tibble(     # `tibble()` creates a data frame, similar to `base::data.frame()`
+  
+  # Exogenous variable & error term:
+  x1 = rnorm(n = 5000, mean = 0, sd = 15),
+  x2 = rnorm(n = 5000, mean = -10, sd =0.5),
+  e = rnorm(5000, 0, 1)
+)
+
+#Population parameters
+a <- -10
+b1 <- 0.1
+b2 <-2
+
+# Dependent variable:
+df <- df %>% 
+  mutate(                          # mutate() creates new variables within a data frame
+  y = a + b1 * x1 +b2*x2 + e
+) %>% 
+  relocate(y, x1, x2, e)                # to reorder the variables
+```
+
+### Exercise 1.2
+
+Estimate three regression models corresponding to the following hypothesized relationships:  
+1. $y = a + b1 \cdot x1 + e$;  
+2. $y = a + b2 \cdot x2 + e$;  
+3. $y = a + b1 \cdot x1 + b2 \cdot x2 + e$. 
+
+Produce a regression table with all three models using the `stargazer::stargazer()` function. The regression table should contain: coefficients, standard errors, and three confidence stars corresponding to $\alpha$ levels of respectively 0.05, 0.01, 0.001. Don't forget to set the code chunk option `results = 'asis'`, and to set `type = "html"` in the `stargazer()` function to compile the table correctly.
+
+Finally, use `sjPlot::plot_model()` to plot the **predicted values** of `y` in relation to `x1` and `x2` using the multivariate model. 
+Create the two plots and then self-learn how to combine them into one plot using the `patchwork` package. Put them one on top of the other. 
+
+```{r, results='asis'}
+m1 <- lm(y ~ x1, data = df)
+summary(m1) 
+
+m2 <- lm(y ~ x2, data = df)
+summary(m2)
+
+m3 <- lm (y ~x1 + x2, data = df)
+summary(m3)
+
+stargazer:: stargazer(m1, m2, m3, type = "html")
+```
+
+### Exercise 1.3
+
+Comment the estimated coefficients from the three models.  
+1. How do they compare with the assumed parameters?  
+2. How does the interpretation of `b1` change between model 1 and model 3?  
+3. Finally, compare the effect of `x1` and the effect of `x2`: which one is stronger?  
+4. What is the predicted value of `y` when `x1 = 20` and `x2 = 0`?
+
+Point 1.  
+
+Point 2.  
+
+Point 3. 
+
+Point 4. 
+
+
+# Exercise 2: replication
+
+In this exercise we try to replicate a recent scientific study published on a highly reputable scientific journal and having profound social implications. The study is: [Landwehr and Ojeda (2020)](https://www.cambridge.org/core/journals/american-political-science-review/article/democracy-and-depression-a-crossnational-study-of-depressive-symptoms-and-nonparticipation/F130385CE49E480832DC3A07B43A2CD4): "Democracy and Depression: A Cross-National Study of Depressive Symptoms and Non-Participation", published on the *American Political Science Review*. 
+
+**Replication goal**. Aim at replicating Table 3 in the text and the corresponding predicted probabilities in Figure 2. Remember that this is mainly a learning opportunity for us and you are allowed to fail the replication. #nostress
+
+**Instructions**.  
+1. First, open the paper, read the abstract and quickly skim through it: what is the main research question? What is the main finding?  
+2. Next, head to the [APSR dataverse page of the study](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/ZABHCA) to download the data files. Read the any readme file.  
+3. As you will note, the study uses different data files, start with the first one (i.e., ESS) and start up the first model in the table and the first predicted probability plot. Then, if the time allows, proceed with the other files (i.e., GESIS, then BHPS, then Qualtrics).  
+
+A good replication is an active and extended replication: do you see any strange modification of the code? What happens if you change an assumption? Good luck!
+
+``` {r}
+ESS<- foreign:: read.dta("ESS_data.dta")
+
+
+
+```
