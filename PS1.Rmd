@@ -317,10 +317,10 @@ In this exercise we try to replicate a recent scientific study published on a hi
 A good replication is an active and extended replication: do you see any strange modification of the code? What happens if you change an assumption? Good luck!
 
 ``` {r}
-#ESS<- foreign:: read.dta("ESS_data.dta")
-#ESS<- na.omit(ESS)
-#ESS$gndr <- as.numeric(ESS$gndr)
-#ESS$health <- as.numeric(ESS$health)
+ESS<- foreign:: read.dta("ESS_data.dta")
+ESS<- na.omit(ESS)
+ESS$gndr <- as.numeric(ESS$gndr)
+ESS$health <- as.numeric(ESS$health)
 VT<- glm(vote~depression + gndr + agea + eduyrs2 + income + health + rlgblg + married + union_ever + dispro_ess + gdppc_ess1000 + gini_ess1000 + unemploy + unemploy_ess1000 + wave, ESS, family = binomial (link = "logit"))
 summary(VT)
 
