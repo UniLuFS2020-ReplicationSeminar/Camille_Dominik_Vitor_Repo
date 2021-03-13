@@ -16,6 +16,16 @@ output:
     df_print: paged
 ---
 
+  highlight: tango
+theme: cosmo
+toc: yes
+toc_depth: 2
+toc_float:
+  collapsed: false
+df_print: paged
+---
+  
+
 ```{r, include=FALSE}
 # Keep this setup code chunk also in your problem set.
 # Also, use this line to load the packages that are needed
@@ -23,6 +33,8 @@ library(tidyverse)
 library(kableExtra)
 library(DiagrammeR)
 knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning = FALSE)
+options(scipen=999)
+
 ```
 
 
@@ -30,6 +42,11 @@ knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning = FALSE)
 
 # Learning goals
 
+- Experience a fully-reproducible and collaborative workflow using RStudio Projects, RMarkdown and GitHub. 
+=======
+  
+  # Learning goals
+  
 - Experience a fully-reproducible and collaborative workflow using RStudio Projects, RMarkdown and GitHub. 
 - Practice basic linear regression. 
 - Understand the basic scientific research workflow through an active replication of results from a scientific paper.
@@ -44,7 +61,11 @@ Create a **private** repository to avoid disclosing the solutions to the other t
 
 You can work in the `master` repo or, even better, you can experience creating a dedicated `branch` for you work. 
 My recommendation is to develop the workflow round these lines:  
+
 1. From GitHub, create an issue called `yourname-todofeature-progressivenumber` (e.g.: `andrea-exerc1-1`) and briefly describe what you do in there. E.g., "I am going to do exercise 1".  
+=======
+  1. From GitHub, create an issue called `yourname-todofeature-progressivenumber` (e.g.: `andrea-exerc1-1`) and briefly describe what you do in there. E.g., "I am going to do exercise 1".  
+
 2. Then, we [create `branch`](https://stackoverflow.com/a/55592824) named after the issue. Work, commit, commit, commit.  
 3. Once your part of the exercise is completed, push and create a [pull request](https://guides.github.com/introduction/flow/).  
 4. Discuss any changes and let other review your work.  
@@ -61,7 +82,11 @@ Besides being an excellent learning tool, Monte Carlo simulations have a wide ra
 
 To simulate a data generating process we must simulate all the quantities that participate in the creation of the simulated data. 
 These quantities usually include:  
+
 1. Observed (and possibly unobservable) **exogenous variables** for which we must describe a distribution;  
+=======
+  1. Observed (and possibly unobservable) **exogenous variables** for which we must describe a distribution;  
+>>>>>>> d40f859f30905a5be8a2f447bd665157f103cb85
 2. **Population parameters**, that may include simple values or (for more complicated applications) a distribution;  
 3. **Error terms** and their distribution;  
 4. Dependent variable (and possibly other **endogenous variables**).   
@@ -76,7 +101,9 @@ Here is a basic example of simulated data with the R code.
 In this example, we simulate a simple data structure with one independent variable `x1` having a causal effect on the dependent variable `y`. We will assume a simple linear and additive specification, corresponding to the equation: $y = a + b \cdot x1 + e$, where the two parameters `a` and `b` represent respectively an intercept and the slope of the relationship, and `e` is normally-distributed error term. These choices can, of course, be changed at will. They simply represent standard assumptions for the sake of this introductory example.
 
 This data generating process can be represented with the following diagram:
+
 ```{r}
+
 library("DiagrammeR", quietly = TRUE)
 
 # Learn the DiagrammeR package here: 
@@ -219,14 +246,16 @@ b2 <-2
 # Dependent variable:
 df <- df %>% 
   mutate(                          # mutate() creates new variables within a data frame
+
   y = a + b1 * x1 +b2*x2 + e
 ) %>% 
-  relocate(y, x1, x2, e)                # to reorder the variables
+   relocate(y, x1, x2, e)                # to reorder the variables
 ```
 
 ### Exercise 1.2
 
 Estimate three regression models corresponding to the following hypothesized relationships:  
+
 1. $y = a + b1 \cdot x1 + e$;  
 2. $y = a + b2 \cdot x2 + e$;  
 3. $y = a + b1 \cdot x1 + b2 \cdot x2 + e$. 
@@ -247,6 +276,12 @@ m3 <- lm (y ~x1 + x2, data = df)
 summary(m3)
 
 stargazer:: stargazer(m1, m2, m3, type = "html")
+
+p1<-sjPlot::plot_model(m3, type = "pred")
+
+library(patchwork)
+p1$x1 + p1$x2
+
 ```
 
 ### Exercise 1.3
@@ -257,13 +292,14 @@ Comment the estimated coefficients from the three models.
 3. Finally, compare the effect of `x1` and the effect of `x2`: which one is stronger?  
 4. What is the predicted value of `y` when `x1 = 20` and `x2 = 0`?
 
-Point 1.  
 
-Point 2.  
+Point 1. The coefficients are approx. equal to the assumed parameters in all 3 models. However, the inpercept (a) increases from model 1 to model 2 to model 3. 
 
-Point 3. 
+Point 2.  It stays exactly the same.
 
-Point 4. 
+Point 3. X2 is stronger with an effect of ~2.
+
+Point 4. The predicted value of y = -8 in model 3. y2 = -10 & y1 = -28
 
 
 # Exercise 2: replication
@@ -272,7 +308,8 @@ In this exercise we try to replicate a recent scientific study published on a hi
 
 **Replication goal**. Aim at replicating Table 3 in the text and the corresponding predicted probabilities in Figure 2. Remember that this is mainly a learning opportunity for us and you are allowed to fail the replication. #nostress
 
-**Instructions**.  
+**Instructions**.  §
+
 1. First, open the paper, read the abstract and quickly skim through it: what is the main research question? What is the main finding?  
 2. Next, head to the [APSR dataverse page of the study](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/ZABHCA) to download the data files. Read the any readme file.  
 3. As you will note, the study uses different data files, start with the first one (i.e., ESS) and start up the first model in the table and the first predicted probability plot. Then, if the time allows, proceed with the other files (i.e., GESIS, then BHPS, then Qualtrics).  
@@ -280,8 +317,47 @@ In this exercise we try to replicate a recent scientific study published on a hi
 A good replication is an active and extended replication: do you see any strange modification of the code? What happens if you change an assumption? Good luck!
 
 ``` {r}
-ESS<- foreign:: read.dta("ESS_data.dta")
+#ESS<- foreign:: read.dta("ESS_data.dta")
+#ESS<- na.omit(ESS)
+#ESS$gndr <- as.numeric(ESS$gndr)
+#ESS$health <- as.numeric(ESS$health)
+VT<- glm(vote~depression + gndr + agea + eduyrs2 + income + health + rlgblg + married + union_ever + dispro_ess + gdppc_ess1000 + gini_ess1000 + unemploy + unemploy_ess1000 + wave, ESS, family = binomial (link = "logit"))
+summary(VT)
 
+PLOT1<- sjPlot::plot_model(VT, type="pred", title="ESS", axis.title = "Predicted Probability of Voting")
+PLOT1$depression
+
+# Unfortunately, the variable "election" is missing in the given data set, therefore an exact replication is not possible.
+
+```
+
+``` {r}
+
+ESS<- na.omit(ESS)
+VT2<- lm(motivation~depression + gndr + agea + eduyrs2 + income + health + rlgblg + married + union_ever + dispro_ess + gdppc_ess1000 + gini_ess1000 + unemploy + unemploy_ess1000 + wave , ESS)
+summary(VT2)
+
+#Why is the intercept always different?
 
 
 ```
+
+``` {r}
+
+ESS<- na.omit(ESS)
+VT3<- glm(phy_act~depression + gndr + agea + eduyrs2 + income + health + rlgblg + married + union_ever + dispro_ess + gdppc_ess1000 + gini_ess1000 + unemploy + unemploy_ess1000 + wave , ESS, family=quasibinomial(link="logit"))
+summary(VT3)
+#Election is missing.
+
+```
+
+``` {r, results='asis'}
+ESS<- na.omit(ESS)
+VT4<- glm(nop_act~depression + gndr + agea + eduyrs2 + income + health + rlgblg + married + union_ever + dispro_ess + gdppc_ess1000 + gini_ess1000 + unemploy + unemploy_ess1000 + wave , ESS, family=quasibinomial(link="logit"))
+summary(VT4)
+
+
+stargazer::stargazer(VT, VT2, VT3, VT4, type = "html")
+```
+
+
