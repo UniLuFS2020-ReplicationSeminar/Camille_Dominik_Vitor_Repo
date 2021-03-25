@@ -77,14 +77,21 @@ df <- df %>%
 Using the simulated data, estimate a linear regression model showing that there is no selection bias. Avoid `stargazer`, just quickly execute `summary(lm(.))`. 
 
 ```{r}
+summary(lm(y1 ~ y0, data = df))
 
 ```
 
 ## Exercise 1.3
 
-Always using the generate data, compute the observed health status `y` using the appropriate values of the potential outcomes. Add the variable to the `df` data. State in one line which variables you would observe in a standard data analysis and which you would not observe (i.e., they are only observed using simulations). 
+Always using the generated data, compute the observed health status `y` using the appropriate values of the potential outcomes. Add the variable to the `df` data. State in one line which variables you would observe in a standard data analysis and which you would not observe (i.e., they are only observed using simulations). 
 
 ```{r}
+df <- df %>% 
+  mutate(    
+    y = ifelse(coin == 0, y0, y1)
+    
+  ) 
+# I would only observe the dependent and independent variables and the treatment, but not the error term, nor the individual causal effect.
 
 ```
 
@@ -95,6 +102,10 @@ Is this close to the average treatment effect (`0.5`)? Why? Compare the mean wit
 
 ```{r}
 
+mean(df$y1) - mean(df$y0)
+# The mean is 0.251306 and therefore is only about half of the average treatement effect of 0.5. bc other variables might impact the difference, selection bias?
+# It is very close to the y-intercept (beta0) of the regression model. 
+
 ```
 
 ## Exercise 1.5
@@ -102,7 +113,14 @@ Is this close to the average treatment effect (`0.5`)? Why? Compare the mean wit
 Finally, also compute the average treatment effect on the treated and the selection bias. 
 
 ```{r}
+#average treatement effect
+df$coin <- as.numeric(df$coin)
+treat <- filter(df, coin == "1")
+no_treat <- filter(df, coin == "0")
+mean(treat$y1) - mean(treat$y0) # = 0.5039907
 
+#selection bias
+mean (treat$y0) - mean(no_treat$y0) # 0.0003414119
 ```
 
 
