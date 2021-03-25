@@ -59,7 +59,7 @@ df <- tibble(
   
   y0 = rnorm(n = 5000, mean = 0, sd = 1),
   e = rnorm(5000, 0, 1/5),
-  coin = rbinom(5000, 1 ,0.5))
+  coin = rbinom(5000, 1 , 0.5))
   
   
 # Dependent variable:
@@ -103,8 +103,8 @@ Is this close to the average treatment effect (`0.5`)? Why? Compare the mean wit
 ```{r}
 
 mean(df$y1) - mean(df$y0)
-# The mean is 0.251306 and therefore is only about half of the average treatement effect of 0.5. bc other variables might impact the difference, selection bias?
-# It is very close to the y-intercept (beta0) of the regression model. 
+# The mean is 0.251306 and therefore is only about half of the average treatement effect of 0.5.
+# The coefficient however, is 0.5 like the treatement effect. This makes sense, because the change from no insurance to insurance should be the treatement effect of 0.5.
 
 ```
 
@@ -212,4 +212,12 @@ This week we replicate a juicy new experimental paper published on the Journal o
 
 **Tip**.
 A good replication is an active and extended replication: do you see any strange modification of the code? What happens if you change an assumption? Good luck!
+
+
+```{r}
+df_r <- haven:: read_dta("Aff. Pol. Exp. Data.dta")
+
+
+
+```
 
