@@ -1,0 +1,164 @@
+
+---
+title: "Problem Set 2"
+author: 
+- name: Author One
+- name: Author Two
+- name: Author Three
+date: "24 March 2021"
+output:
+  html_document:
+    highlight: tango
+    theme: cosmo
+    toc: yes
+    toc_depth: 2
+    toc_float:
+      collapsed: false
+    df_print: paged
+---
+
+```{r, include=FALSE}
+# Keep this setup code chunk also in your problem set.
+# Also, use this line to load the packages that are needed
+library(tidyverse)
+library(kableExtra)
+library(DiagrammeR)
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning = FALSE)
+```
+
+
+# Learning goals
+
+- Clarifying the logic of potential outcomes
+- Understanding the set up of randomized controlled trials
+- Practicing the analysis of experimental data
+
+# Part 1: potential outcomes and experiments
+
+We simulate a simple scenario where we are interested in studying the effect of `D` on `Y`. 
+The dependent variable $Y_i$ is what we observe, but we also simulate the potential outcomes' quantities $Y_{0i} = Y_i | D == 0$ and  $Y_{1i} = Y_i | D == 1$. 
+As in the previous PS, remember that exogenous quantities are generated via random drams from assumed distributions, e.g. `x = rnorm(n=1000, mean = 0, sd = 1)`, while endogenmous variables depend on the values of otehr quantities and therefore are generated inside a `mutate()` call. 
+
+## Exercise 1: No selection bias
+
+In this first exercise you are going to create simulated data in a scenario where we have **no selection bias**. 
+
+## Exercise 1.1
+
+Generate a data set named `df` following these instructions: 
+
+1. Consider `N = 5000` observations and set the seed to `24032021`.  
+2. Generate **three exogenous variables**. `y0` is the potential outcome representing $y_i|D=0$. You may see this as e.g., the health status given that the individuals decide not to get an insurance. Simulate the quantity drawing the values from a normal distribution with mean `0` and standard deviation `1`. Next, generate random treatment assignment created with a coin toss. You can simulate coin tosses using a random binomial distribution: `rbinom(n, size, prob)`. Self-learn the function to generate the random treatment assignment with values `0` (= no insurance) and `1` (= insurance), and a probability of `0.5`.  Finally, create a random error term `e` that is normally distributed with mean = `0` and standard deviation `1/5`. 
+3. At this point generate the endogenous variable `y1`: this is the potential outcome $y_i|D=1$. Create the variable self-learning the conditional assignment function `ifelse(test, yes, no)`: if the treatment is `D=0`, then `y1` is equal to the baseline health status under potential outcome with no treatment (`y0`), plus the error term; if the treatment is `D=1`, then `y1` is equal to the baseline potential health with no insurance, plus a constant treatment effect of 0.5, plus the error term. 
+
+
+```{r}
+set.seed(24032021) # For reproducibility (I like to use dates as seed)
+
+df <- tibble(     
+  
+  y0 = rnorm(n = 5000, mean = 0, sd = 1),
+  e = rnorm(5000, 0, 1/5),
+  coin = rbinom(5000, 1 ,0.5))
+  
+  
+# Dependent variable:
+df <- df %>% 
+  mutate(    
+    d0 = y0 + e,
+    d1 = y0 + 0.5 + e,
+    y1 = ifelse(coin == 0, d0, d1 )
+    
+  ) %>% 
+  relocate(y0, y1, coin, e) 
+```
+## Exercise 1.2
+
+Using the simulated data, estimate a linear regression model showing that there is no selection bias. Avoid `stargazer`, just quickly execute `summary(lm(.))`. 
+
+```{r}
+
+```
+
+## Exercise 1.3
+
+Always using the generate data, compute the observed health status `y` using the appropriate values of the potential outcomes. Add the variable to the `df` data. State in one line which variables you would observe in a standard data analysis and which you would not observe (i.e., they are only observed using simulations). 
+
+```{r}
+
+```
+
+## Exercise 1.4
+
+Use the simple `mean()` function to compute the observed average difference between the treatment and control group. 
+Is this close to the average treatment effect (`0.5`)? Why? Compare the mean with the coefficient from linear regression model.
+
+```{r}
+
+```
+
+## Exercise 1.5
+
+Finally, also compute the average treatment effect on the treated and the selection bias. 
+
+```{r}
+
+```
+
+
+## Exercise 2: Selection bias
+
+In this first exercise we simulate data in a scenario where we **have selection bias**. 
+Note that the data generating process is going to be quite different. 
+
+## Exercise 2.1
+
+Generate a data set named `dfsb` following these instructions: 
+
+1. Consider `N = 5000` observations and set the seed to `24032021`.  
+2. Generate **two exogenous variables**. `z` is a confounder (omitted variable) inducing selection bias. You can think of this like some latent quantity affecting the underlying health and the decision to take the treatment. For instance, the family background (e.g., higher social class correlates with better health and higher probability to get insured). Generate `z` drawing values from a standard normal distribution (`mean = 0` and `sd = 1`). Next, create a random error term `e` that is normally distributed with mean = `0` and standard deviation `1/5`.  
+3. At this point generate **four endogenous variables**: first, the potential outcome `y0`: this is the potential outcome when $y_i|D=0$. Create the variable as given by the sum of an exogenous component (`rnorm(mean=0,sd=1)` that you can generate directly inside `mutate()` or just use `e`) and the variable `z` with a slope parameter of `0.5` (leave no intercept, i.e. `a=0`). Next, generate the treatment assignment in two steps (you can type one next to the other directly inside `mutate()`): first, create `D` as a linear function of `z`, also with slope `0.5` and no intercept; then, use `ifesle()` to set the treatment either to `0` or `1` depending on whether `D` is respectively lower or larger than `mean(D)`. Finally, generate the potential outcome under the treatment `y1` as sum of three components: `y0`, the treatment `D` with a slope parameter of `0.5`, and the error term `e`. self-learning the conditional assignment function `ifelse(test, yes, no)`: if the treatment is `D=0`, then `y1` is equal to the baseline health status under potential outcome with no treatment (`y0`), plus the error term; if the treatment is `D=1`, then `y1` is equal to the baseline potential health with no insurance, plus a constant treatment effect of 0.5, plus the error term. 
+
+
+```{r}
+
+```
+
+## Exercise 2.2
+
+Using the simulated data, estimate a linear regression model showing that there is selection bias. 
+Interpret the result in one line. 
+
+```{r}
+
+```
+
+## Exercise 2.3
+
+Compute once again the observed health status `y` using the appropriate values of the potential outcomes. 
+Use it to compute: 1. observed average difference between the treatment and control group; 2. average treatment effect on the treated; 3. selection bias. Compare these quantities with the simulated average treatment effect of `D` on `Y0` (`=0.5). 
+
+Conclude writing and showing their equivalence. 
+
+
+```{r}
+
+```
+
+
+# Part 3: replication
+
+This week we replicate a juicy new experimental paper published on the Journal of Experimental Political Science:[Druckman et al. (2020)](https://www.cambridge.org/core/journals/journal-of-experimental-political-science/article/how-affective-polarization-shapes-americans-political-beliefs-a-study-of-response-to-the-covid19-pandemic/B52D17EA47CCC436E8B1B3E008CA2A79): How Affective Polarization Shapes Americans’ Political Beliefs: A Study of Response to the COVID-19 Pandemic.  
+
+**Replication goal**. Aim at replicating models 1 and 3 from Table 1. If you manage, try to complete Table 1 and to plot the predictions from Figure 1. As usual: remember that this is mainly a learning opportunity for us and you are allowed to fail the replication. #nostress
+
+**Instructions**.  
+1. First, open the paper, read the abstract and quickly skim through it: what is the main research question? What is the main finding?  
+2. Next, head to the [APSR dataverse page of the study](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/8I1PUB&widget=dataverse@harvard) to download the data files. Read the any readme file.  
+3. Note that they also use STATA code, feel free to post questions at the GitHub repo. 
+
+**Warning**. You must work collaboratively using GitHub. Please create the repo at the class organization (not at your personal account). All the tips from PS1 still apply (plan the work, use issues, branches, pull requests...). 
+
+**Tip**.
+A good replication is an active and extended replication: do you see any strange modification of the code? What happens if you change an assumption? Good luck!
+
