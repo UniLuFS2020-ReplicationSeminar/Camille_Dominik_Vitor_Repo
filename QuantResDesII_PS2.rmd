@@ -217,6 +217,11 @@ A good replication is an active and extended replication: do you see any strange
 ```{r}
 df_r <- haven:: read_dta("Aff. Pol. Exp. Data.dta")
 
+df_r <- df_r %>% 
+  mutate(    
+    US_condition = ifelse( exptrump == 0, 1 ,0 )
+    
+  ) 
 
 
 ```
