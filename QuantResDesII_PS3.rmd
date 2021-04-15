@@ -45,23 +45,31 @@ Paper 2: Economic Shocks and Civil conflict: An instrumental variables approach
 The paper tests the impact of economic conditions (endogenous treatment) on the likelihood of civic conflict by using rainfall as the instrumental variable. They argue that *rainfall* correlates with economic growth (more or less rain (random) leads to more or less growth) which in turn is negatively related to civic conflict. Thus, a causal relationship is established.
 
 Paper 3: Education and entrepreneurial choice: An instrumental variables approach
-This paper wants to tackle the endogenous problem of the variable education and its impact on the decision to start a business. Since education is impacted by so many other variables (wealth, parents help, social class, place of living etc), they propose the instrumental variable *social class of parents*. Now the impact of education is much stronger. 
+This paper wants to tackle the endogenous problem of the variable education and its impact on the decision to start a business. Since education is impacted by so many other variables (wealth, parents help, social class, place of living etc), they propose the instrumental variable *social class of parents*. Now the impact of education is much stronger, since students from lower classes are more likely to open a business. 
 
 ## Exercise 2 (no coding)
 
-Install the package `wooldridge` and lead the data `bwght` (you can get help with `?bwght` after loading the package). Use the data study the causal effect of smoking mothers on the weight of the babies. 
+Install the package `wooldridge` and lead the data `bwght` (you can get help with `?bwght` after loading the package). Use the data to study the causal effect of smoking mothers on the weight of the babies. 
 
 First think:   
-1. What would be the ideal experiment to identify the relationship between maternal smoking and the weight of the baby? What would be the problem with that?  
-2. Can you think of a good instrument for smoking cigarettes? Better if the instrument... is not in the data! :)  
+1. What would be the ideal experiment to identify the relationship between maternal smoking and the weight of the baby? What would be the problem with that?
+It would be ideal to randomly select pregnant women to smoke or not smoke during pregnancy and then weight all the babies after birth. Of course, we cannot do that because you cannot force pregnant women into smoking since smoking is really bad for the health of both the mother and the baby.
+2. Can you think of a good instrument for smoking cigarettes? Better if the instrument... is not in the data! :)
+IV: rainy and cold weather, since people tend to smoke more with sunny/warm weather. 
 3. Describe the three requirement with respect to your instrument. 
-
+1. causal effect: People tend to smoke more with sunny/ warm weather than by cold/ rainy.
+2. Weather is always random (except if one believes the weather manipulation theories...which we don't)
+3. Weather does not impact the weight of a baby, only the amount of cigarettes a pregnant women might smoke.
 
 ## Exercise 3
 Find the variables for the number of cigarettes smoked during pregnancy and the weight of the babies (which is an indicator of overall health of newborn babies). 
 
 ### 3.1
 Start by exploring the naive correlation between the number of cigarettes smoked per day during pregnancy on the birth weight in ounces: use the two variables to estimate a naive OLS regression model that predicts the weight of babies with the number of cigarettes smoked by the mother during the pregnancy. What do you find? is this an estimate of the causal effect of smoking? Why? Finally, choose from the variable list two potential omitted variables and add them to a second model. Is the estimate changing? Is this a causal effect now?
+```{r}
+data(bwght)
+
+```
 
 ### 3.2
 Check out the data and find a viable **instrument** for smoking. 
