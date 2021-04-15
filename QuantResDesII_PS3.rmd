@@ -25,6 +25,7 @@ library(kableExtra)
 library(wooldridge)
 library(AER)
 library(stargazer)
+
 knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning = FALSE)
 ```
 
@@ -134,4 +135,55 @@ Therefore, the analysis shows that with instrumental variable the impact of smok
 Skim through the paper by Acemoglu, Johnson, and Robinson (2001) [[link](https://www.aeaweb.org/articles?id=10.1257/aer.91.5.1369)]. Describe their research question, the source of endogeneity, and the instrumental variable that they use. (max 4 lines) Then, use the replication data stored [here](https://www.openicpsr.org/openicpsr/project/112564/version/V1/view?path=/openicpsr/112564/fcr:versions/V1/Acemoglu-Johnson-and-Robinson-datafiles&type=folder) to replicate Figure 1, Figure 3, and Table 4 (panel A only, p. 1386). 
 
 **Warning**. You must work collaboratively using GitHub. Please create the repo at the class organization (not at your personal account). All the tips from PS1 still apply (plan the work, use issues, branches, pull requests...). 
+
+Research Question: What are the fundamental causes of the large differences in income per capita across countries?
+Source of endogeneity: very different colonization policies in different colonies, with different associated institutions
+instrumental variable: mortality rates
+They use mortality rates to explain differences in policies and institutions among european colonies, which then in turn influence up until today the income per capita across these countries. 
+
+```{r}
+fig1 <- haven::read_dta("Reply-to-Albouy-dataset-for-AER-replication-filing-May-2-2012.dta")
+
+
+ggplot(fig1, aes( logmort0, loggdp)) +
+  geom_text(aes(label=shortnam)) + geom_smooth(method = lm, se = FALSE) + labs(title = "FIGURE 1. REDUCED-FORM RELATIONSHIP BETWEEN INCOME AND SETTLER MORTALITY", x = "Log of Settler Mortality", y = "Log GDP per Capita") 
+
+
+```
+# figure 3
+```{r}
+ggplot(fig1, aes( logmort0, risk)) +
+  geom_text(aes(label=shortnam)) + geom_smooth(method = lm, se = FALSE) + labs(title = "FIGURE 3. FIRST-STAGE RELATIONSHIP BETWEEN SETTLER MORTALITY AND EXPROPRIATION RISK", x = "Log of Settler Mortality", y = "Average Expropriation Risk") 
+
+
+```
+```{r results='asis'}
+#base models
+m1 <-ivreg(loggdp ~ risk | logmort0, data = fig1)
+summary(m1)
+m2 <- ivreg(loggdp ~ risk + latitude | logmort0 + latitude, data = fig1)
+summary(m2)
+
+#no neo-europ
+ne <-filter( fig1, neoeuro == 0)
+m3 <- ivreg(loggdp ~risk | logmort0, data = ne)
+summary(m3)
+m4 <- ivreg(loggdp ~risk + latitude | logmort0 + latitude, data = ne)
+summary(m4)
+
+# no africa
+na <- filter(fig1, africa == 0)
+m5 <- ivreg(loggdp ~risk | logmort0, data = na)
+summary(m5)
+m6 <- ivreg(loggdp ~risk  + latitude| logmort0 + latitude, data = na)
+summary(m6)
+
+#with continent
+m7 <- ivreg(loggdp ~risk + africa + asia + other | logmort0 + africa + asia + other, data = fig1)
+summary(m7)
+m8 <- ivreg(loggdp ~risk + africa + asia + other + latitude | logmort0 + africa + asia + other + latitude, data = fig1)
+summary(m8)
+
+stargazer(m1, m2, m3, m4, m5, m6, m7, m8, type = "html")
+```
 
