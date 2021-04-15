@@ -1,0 +1,89 @@
+
+---
+title: "Problem Set 3 - Instrumental Variables"
+author: 
+- name: Author One
+- name: Author Two
+- name: Author Three
+date: "24 March 2021"
+output:
+  html_document:
+    highlight: tango
+    theme: cosmo
+    toc: yes
+    toc_depth: 2
+    toc_float:
+      collapsed: false
+    df_print: paged
+---
+
+```{r, include=FALSE}
+# Keep this setup code chunk also in your problem set.
+# Also, use this line to load the packages that are needed
+library(tidyverse)
+library(kableExtra)
+library(wooldridge)
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning = FALSE)
+```
+
+
+# Learning goals
+
+- Understanding the set up of IV studies
+- Apply IV regression in practice
+- Practicing data analysis
+
+
+## Exercise 1
+
+Use Google Scholar to find three examples of instrumental variables in published scientific research (in any area). List the three instruments describing (1-2 lines) the outcome variable, the endogenous treatment, and how the instrument solves the issue. 
+
+Paper 1: The medial care costes of obesity: An instrumental variables approach
+This paper explains the impact of obesity on medical costs by using *genetic variation in weight* as the instrumental variable (natural exp.). Weight is the endogenous treatment, which leads to a general underestimation of medical costs.The IV reduces error in weight reporting and distinguishes between natural obesity and obesity due to depression or injury. 
+
+Paper 2: Economic Shocks and Civil conflict: An instrumental variables approach
+The paper tests the impact of economic conditions (endogenous treatment) on the likelihood of civic conflict by using rainfall as the instrumental variable. They argue that *rainfall* correlates with economic growth (more or less rain (random) leads to more or less growth) which in turn is negatively related to civic conflict. Thus, a causal relationship is established.
+
+Paper 3: Education and entrepreneurial choice: An instrumental variables approach
+This paper wants to tackle the endogenous problem of the variable education and its impact on the decision to start a business. Since education is impacted by so many other variables (wealth, parents help, social class, place of living etc), they propose the instrumental variable *social class of parents*. Now the impact of education is much stronger. 
+
+## Exercise 2 (no coding)
+
+Install the package `wooldridge` and lead the data `bwght` (you can get help with `?bwght` after loading the package). Use the data study the causal effect of smoking mothers on the weight of the babies. 
+
+First think:   
+1. What would be the ideal experiment to identify the relationship between maternal smoking and the weight of the baby? What would be the problem with that?  
+2. Can you think of a good instrument for smoking cigarettes? Better if the instrument... is not in the data! :)  
+3. Describe the three requirement with respect to your instrument. 
+
+
+## Exercise 3
+Find the variables for the number of cigarettes smoked during pregnancy and the weight of the babies (which is an indicator of overall health of newborn babies). 
+
+### 3.1
+Start by exploring the naive correlation between the number of cigarettes smoked per day during pregnancy on the birth weight in ounces: use the two variables to estimate a naive OLS regression model that predicts the weight of babies with the number of cigarettes smoked by the mother during the pregnancy. What do you find? is this an estimate of the causal effect of smoking? Why? Finally, choose from the variable list two potential omitted variables and add them to a second model. Is the estimate changing? Is this a causal effect now?
+
+### 3.2
+Check out the data and find a viable **instrument** for smoking. 
+Defend the three requirements of the instrument.
+
+### 3.3
+Now manually compute the two stages of the 2SLS strategy (i.e., first stage, predict, and then use predicted values in the outcome equation).
+
+### 3.4
+Finally, estimate a 2SLS in one go calling the function `AER::ivreg()`. Self-learn how to use it. 
+
+### 3.5 
+Build a regression table with three models:  
+1. `Naive OLS` with the simple naive regression of baby weights on cigarettes smoked;  
+2. `IV manual` with the result from the two stages estimated manually (show only outcome equation);  
+3. `IV-2SLS` with the result from `ivreg()`. 
+
+Comment. 
+
+## Exercise 4 
+
+Skim through the paper by Acemoglu, Johnson, and Robinson (2001) [[link](https://www.aeaweb.org/articles?id=10.1257/aer.91.5.1369)]. Describe their research question, the source of endogeneity, and the instrumental variable that they use. (max 4 lines) Then, use the replication data stored [here](https://www.openicpsr.org/openicpsr/project/112564/version/V1/view?path=/openicpsr/112564/fcr:versions/V1/Acemoglu-Johnson-and-Robinson-datafiles&type=folder) to replicate Figure 1, Figure 3, and Table 4 (panel A only, p. 1386). 
+
+**Warning**. You must work collaboratively using GitHub. Please create the repo at the class organization (not at your personal account). All the tips from PS1 still apply (plan the work, use issues, branches, pull requests...). 
+
