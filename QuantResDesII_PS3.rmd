@@ -68,18 +68,44 @@ Find the variables for the number of cigarettes smoked during pregnancy and the 
 Start by exploring the naive correlation between the number of cigarettes smoked per day during pregnancy on the birth weight in ounces: use the two variables to estimate a naive OLS regression model that predicts the weight of babies with the number of cigarettes smoked by the mother during the pregnancy. What do you find? is this an estimate of the causal effect of smoking? Why? Finally, choose from the variable list two potential omitted variables and add them to a second model. Is the estimate changing? Is this a causal effect now?
 ```{r}
 data(bwght)
+m1 <- lm(bwght ~ cigs, data= bwght)
+summary(m1)
+
+# model with 2 ommited variables
+m2 <- lm(bwght ~  cigs + faminc + male, data= bwght)
+summary(m2)
 
 ```
+Model 1 shows a strong negative impact of cigarettes on baby's weight. The more cigarettes a mother smokes during pregnancy, the less weight a baby has after birth. No, this is no causal effect (only correlation), since smoking cigarettes is endogenous and so many other variables could have an impact on the baby's weight, for example *income of family* (if they are poor, maybe they do not have enough food and therefore the baby is light) or *gender of baby* might matter, since boys are generally a bit heavier than girls. 
+
+Model 2 shows the results of the regression with omitted variables. However, the estimate is not changing. The two possible omitted variables are both significant but do not change the outcome of cigarettes and therefore are not omitted variables.
 
 ### 3.2
 Check out the data and find a viable **instrument** for smoking. 
 Defend the three requirements of the instrument.
+IV: cigarette tax in home state
+1. The more a mother has to be for a cigarette, the less likely she will buy them.
+2. It is random, because the tax is different in each state and nobody would actually move into a different state just to have lower cigs. taxes.
+3. The tax of cigarettes cannot influence a baby's weight directly.
 
 ### 3.3
 Now manually compute the two stages of the 2SLS strategy (i.e., first stage, predict, and then use predicted values in the outcome equation).
+```{r}
+m3 <- lm (cigs ~cigtax, data = bwght)
+summary(m3)
+
+m4 <- lm (bwght ~ m3$effects, data = bwght)
+summary(m4)
+```
+
 
 ### 3.4
 Finally, estimate a 2SLS in one go calling the function `AER::ivreg()`. Self-learn how to use it. 
+```{r}
+m5 <- AER:: ivreg(bwght ~ cigs| cigtax, data = bwght)
+summary(m5)
+```
+
 
 ### 3.5 
 Build a regression table with three models:  
