@@ -23,6 +23,8 @@ output:
 library(tidyverse)
 library(kableExtra)
 library(wooldridge)
+library(AER)
+library(stargazer)
 knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning = FALSE)
 ```
 
@@ -53,8 +55,11 @@ Install the package `wooldridge` and lead the data `bwght` (you can get help wit
 
 First think:   
 1. What would be the ideal experiment to identify the relationship between maternal smoking and the weight of the baby? What would be the problem with that?
+
 It would be ideal to randomly select pregnant women to smoke or not smoke during pregnancy and then weight all the babies after birth. Of course, we cannot do that because you cannot force pregnant women into smoking since smoking is really bad for the health of both the mother and the baby.
+
 2. Can you think of a good instrument for smoking cigarettes? Better if the instrument... is not in the data! :)
+
 IV: rainy and cold weather, since people tend to smoke more with sunny/warm weather. 
 3. Describe the three requirement with respect to your instrument. 
 1. causal effect: People tend to smoke more with sunny/ warm weather than by cold/ rainy.
@@ -66,6 +71,11 @@ Find the variables for the number of cigarettes smoked during pregnancy and the 
 
 ### 3.1
 Start by exploring the naive correlation between the number of cigarettes smoked per day during pregnancy on the birth weight in ounces: use the two variables to estimate a naive OLS regression model that predicts the weight of babies with the number of cigarettes smoked by the mother during the pregnancy. What do you find? is this an estimate of the causal effect of smoking? Why? Finally, choose from the variable list two potential omitted variables and add them to a second model. Is the estimate changing? Is this a causal effect now?
+
+Model 1 shows a strong negative impact of cigarettes on baby's weight. The more cigarettes a mother smokes during pregnancy, the less weight a baby has after birth. No, this is no causal effect (only correlation), since smoking cigarettes is endogenous and so many other variables could have an impact on the baby's weight, for example *income of family* (if they are poor, maybe they do not have enough food and therefore the baby is light) or *gender of baby* might matter, since boys are generally a bit heavier than girls. 
+
+Model 2 shows the results of the regression with omitted variables. However, the estimate is not changing. The two possible omitted variables are both significant but do not change the outcome of cigarettes and therefore are not omitted variables.
+
 ```{r}
 data(bwght)
 m1 <- lm(bwght ~ cigs, data= bwght)
@@ -76,9 +86,6 @@ m2 <- lm(bwght ~  cigs + faminc + male, data= bwght)
 summary(m2)
 
 ```
-Model 1 shows a strong negative impact of cigarettes on baby's weight. The more cigarettes a mother smokes during pregnancy, the less weight a baby has after birth. No, this is no causal effect (only correlation), since smoking cigarettes is endogenous and so many other variables could have an impact on the baby's weight, for example *income of family* (if they are poor, maybe they do not have enough food and therefore the baby is light) or *gender of baby* might matter, since boys are generally a bit heavier than girls. 
-
-Model 2 shows the results of the regression with omitted variables. However, the estimate is not changing. The two possible omitted variables are both significant but do not change the outcome of cigarettes and therefore are not omitted variables.
 
 ### 3.2
 Check out the data and find a viable **instrument** for smoking. 
@@ -92,9 +99,10 @@ IV: cigarette tax in home state
 Now manually compute the two stages of the 2SLS strategy (i.e., first stage, predict, and then use predicted values in the outcome equation).
 ```{r}
 m3 <- lm (cigs ~cigtax, data = bwght)
-summary(m3)
+pred <-predict(m3)
 
-m4 <- lm (bwght ~ m3$effects, data = bwght)
+
+m4 <- lm (bwght ~ pred, data = bwght)
 summary(m4)
 ```
 
@@ -102,7 +110,7 @@ summary(m4)
 ### 3.4
 Finally, estimate a 2SLS in one go calling the function `AER::ivreg()`. Self-learn how to use it. 
 ```{r}
-m5 <- AER:: ivreg(bwght ~ cigs| cigtax, data = bwght)
+m5 <- ivreg(bwght ~ cigs| cigtax, data = bwght)
 summary(m5)
 ```
 
@@ -112,8 +120,14 @@ Build a regression table with three models:
 1. `Naive OLS` with the simple naive regression of baby weights on cigarettes smoked;  
 2. `IV manual` with the result from the two stages estimated manually (show only outcome equation);  
 3. `IV-2SLS` with the result from `ivreg()`. 
+```{r results='asis'}
+stargazer(m1, m4, m5, type = "html")
+```
 
-Comment. 
+Comment.
+
+The strongest statistically significant relationship is definitely model 1 (without any instrument). When doing the 2sls approach manually, at least it stays slightly significant but with the ivreg() all significance vanishes. However, the constant is always significant, meaning that *no tax* increases the cigarette consumption and decreases the weight. Yet, the difference in taxes has no impact. 
+Therefore, the analysis shows that with instrumental variable the impact of smoking mothers on a baby's weight vanishes dramatically, which makes sense, since there are many more reasons for a baby's weight - especially since the majority of mothers in the sample (1000+) do not smoke, but still have different baby weights.
 
 ## Exercise 4 
 
