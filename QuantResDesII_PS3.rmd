@@ -2,9 +2,9 @@
 ---
 title: "Problem Set 3 - Instrumental Variables"
 author: 
-- name: Author One
-- name: Author Two
-- name: Author Three
+- name: Camille Leyrer
+- name: Dominik Walter
+- name: Vitor Krasniqi
 date: "24 March 2021"
 output:
   html_document:
@@ -41,13 +41,13 @@ knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning = FALSE)
 
 Use Google Scholar to find three examples of instrumental variables in published scientific research (in any area). List the three instruments describing (1-2 lines) the outcome variable, the endogenous treatment, and how the instrument solves the issue. 
 
-Paper 1: The medial care costes of obesity: An instrumental variables approach
+Paper 1: [The medial care costes of obesity: An instrumental variables approach] (https://www.sciencedirect.com/science/article/abs/pii/S0167629611001366)
 This paper explains the impact of obesity on medical costs by using *genetic variation in weight* as the instrumental variable (natural exp.). Weight is the endogenous treatment, which leads to a general underestimation of medical costs.The IV reduces error in weight reporting and distinguishes between natural obesity and obesity due to depression or injury. 
 
-Paper 2: Economic Shocks and Civil conflict: An instrumental variables approach
+Paper 2: [Economic Shocks and Civil conflict: An instrumental variables approach] (https://www.journals.uchicago.edu/doi/abs/10.1086/421174)
 The paper tests the impact of economic conditions (endogenous treatment) on the likelihood of civic conflict by using rainfall as the instrumental variable. They argue that *rainfall* correlates with economic growth (more or less rain (random) leads to more or less growth) which in turn is negatively related to civic conflict. Thus, a causal relationship is established.
 
-Paper 3: Education and entrepreneurial choice: An instrumental variables approach
+Paper 3: [Education and entrepreneurial choice: An instrumental variables approach] (https://journals.sagepub.com/doi/abs/10.1177/0266242611400470)
 This paper wants to tackle the endogenous problem of the variable education and its impact on the decision to start a business. Since education is impacted by so many other variables (wealth, parents help, social class, place of living etc), they propose the instrumental variable *social class of parents*. Now the impact of education is much stronger, since students from lower classes are more likely to open a business. 
 
 ## Exercise 2 (no coding)
