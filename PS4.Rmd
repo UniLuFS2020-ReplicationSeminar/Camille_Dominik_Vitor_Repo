@@ -398,7 +398,7 @@ rd.sens <- function( data , force.var , yvar , seat.identifier , fixed.effects
 library( dplyr )
 library( magrittr )
 load("ds.Rdata")
-
+rrp_rdd$er.in_l <- factor(rrp_rdd$er.in_l)
 # Figure 1: Mainstream party position change on cultural protectionism
 
 p1 <- jump.plot(data = subset(rrp_rdd , er.v.c_l <= 10 ) 
@@ -412,7 +412,7 @@ p1
 
 
 # Table 2: Mainstream party position change on cultural protectionism
-rd.multic <- rd.base( data = ds
+rd.multic <- rd.base( data = rrp_rdd
                       , force.var = 'er.v.c_l' 
                       , yvar = 'multic.logit_fd'
                       , seat.identifier = 'er.in_l' 
@@ -423,7 +423,7 @@ rd.multic <- rd.base( data = ds
                       , bws = NULL
                       )
 rd.multic
-print(xtable:: xtable(rd.multic), comment = FALSE, include.rownames = FALSE)
+print(xtable:: xtable(rd.multic), comment = FALSE, include.rownames = FALSE, type = "html")
 
 
 
