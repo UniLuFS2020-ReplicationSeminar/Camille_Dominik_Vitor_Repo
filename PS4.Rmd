@@ -2,15 +2,36 @@
 title: "PS4"
 author: "Camille Leyrer, Dominik Walter, Vitor Krasniqi"
 date: "30 4 2021"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+
+
+## Research Design of "The Causal Effect of Radical Right Success on Mainstream Parties’ Policy Positions. A Regression Discontinuity Approach."
+In this Paper we investigate whether the performance of radical right parties in the previous general election causes mainstream parties adjust their policy position on immigration. For this reason, the reaction of parties under conditions of continued radical right party influence is examined, so that we can present the established parties' past results as forecasts for upcoming elections.
+
+Parties from the years 1980 to 2014 from the following countries were examined: Austria, Switzerland, Czech Republic, Germany, Denmark, Estonia, Spain, Finland, Greece, Croatia, Italy, Luxembourg, Latvia, Netherlands, Poland, Portugal, Romania, Sweden, Slovenia, Slovakia.
+
+These parties were examined on the Comparative Manifestos Project Data set, and based on this data set, the parties were examined in 20 variables. In this process, some variables were adopted exactly as in the CMP dataset, while other variables were calculated based on the theories of other researchers.  These theories were used to calculate variables such as cultural protectionism score and cultural protectionism score based on the theory of Lowe et al, Kim and Fording, Alonso , Meguid and Lowe.
+
+In this analysis, the regression discontinuity approach was used, with the forcing variable always being the same variable describing the vote share of the radical right party.
+The outcome measured was always one of the scores mentioned above.
+
+
+
 ## Replication of "The Causal Effect of Radical Right Success on Mainstream Parties’ Policy Positions. A Regression Discontinuity Approach."
+
+
 ```{r}
+library(readr)
+rrp_rdd <- read_table2("rrp_rdd.tab")
+
  coeftest.cluster <- function( data , fm , cluster1 = NULL , cluster2 = NULL , ret = 'test' ) {
   options( warn = -1 )
 
@@ -397,7 +418,7 @@ rd.sens <- function( data , force.var , yvar , seat.identifier , fixed.effects
 ```{r }
 library( dplyr )
 library( magrittr )
-load("ds.Rdata")
+#load("ds.Rdata")
 rrp_rdd$er.in_l <- factor(rrp_rdd$er.in_l)
 # Figure 1: Mainstream party position change on cultural protectionism
 
