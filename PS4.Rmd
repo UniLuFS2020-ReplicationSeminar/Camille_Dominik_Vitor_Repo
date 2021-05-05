@@ -23,6 +23,7 @@ These parties were examined on the Comparative Manifestos Project Data set, and 
 In this analysis, the regression discontinuity approach was used, with the forcing variable always being the same variable describing the vote share of the radical right party.
 The outcome measured was always one of the scores mentioned above.
 
+![image](https://user-images.githubusercontent.com/79653368/117112951-1be4be80-ad8a-11eb-8973-03e1aaef6546.png)
 
 
 ## Replication of "The Causal Effect of Radical Right Success on Mainstream Parties’ Policy Positions. A Regression Discontinuity Approach."
